@@ -1,11 +1,18 @@
 import express from "express";
-import Hello from "./Hello.js"; // import the Hello route module
+import cors from "cors";
+import Hello from "./Hello.js";
+import Lab5 from "./Lab5/index.js";
 
 const app = express();
 
-// pass app reference to Hello.js to register routes
-Hello(app);
+// enable CORS for all origins (development-friendly)
+app.use(cors());
+app.use(express.json());
 
-app.listen(4000, () => {
-  console.log("Server running on http://localhost:4000");
-});
+Hello(app);
+Lab5(app);
+
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () =>
+  console.log(`✅ Server running on http://localhost:${PORT}`)
+);
