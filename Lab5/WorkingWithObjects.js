@@ -30,6 +30,10 @@ export default function WorkingWithObjects(app) {
     assignment.completed = req.params.newCompleted === "true";
     res.json(assignment);
   });
+  app.put("/lab5/assignment/title/:title", (req, res) => {
+    assignment.title = req.params.title;
+    res.json(assignment);
+  });
 
   // Module routes
   app.get("/lab5/module", (req, res) => res.json(module));
