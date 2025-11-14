@@ -15,10 +15,7 @@ const app = express();
 // --------------------------------------------
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://kambaz-next-js-gules-sigma.vercel.app", // <-- YOUR ACTUAL VERCEL URL
-    ],
+    origin: ["http://localhost:3000", process.env.CLIENT_URL],
     credentials: true,
   })
 );
