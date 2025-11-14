@@ -17,13 +17,11 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      process.env.CLIENT_URL, // your Vercel URL
-    ].filter(Boolean),
+      "https://kambaz-next-js-gules-sigma.vercel.app", // <-- YOUR ACTUAL VERCEL URL
+    ],
     credentials: true,
   })
 );
-
-app.use(express.json());
 
 // --------------------------------------------
 // ✅ EXPRESS-SESSION (Fix for Vercel + Render)
