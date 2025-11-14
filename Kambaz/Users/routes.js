@@ -104,4 +104,5 @@ export default function UserRoutes(app, db) {
   app.get("/api/users", findAllUsers);
   app.get("/api/users/:userId", findUserById);
   app.delete("/api/users/:userId", deleteUser);
+  app.get("/api/users/signup", (req, res) => res.send("Signup route works!"));
 }

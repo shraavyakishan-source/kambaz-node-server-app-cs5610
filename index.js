@@ -11,35 +11,51 @@ import CourseRoutes from "./Kambaz/Courses/routes.js";
 const app = express();
 
 // --------------------------------------------
-// ✅ CORS (must be FIRST and credentials:true)
+// ✅ Body parser middleware for JSON
+// --------------------------------------------
+app.use(express.json());
+
+// --------------------------------------------
+// ✅ Debug: Check CLIENT_URL env
+// --------------------------------------------
+console.log("CLIENT_URL from env:", process.env.CLIENT_URL);
+
+// --------------------------------------------
+// ✅ CORS (must be BEFORE routes & credentials:true)
 // --------------------------------------------
 app.use(
   cors({
     origin: ["http://localhost:3000", process.env.CLIENT_URL],
-    credentials: true,
+    credentials: true, // allow cookies/sessions
   })
 );
 
+// Optional: Debug incoming origins
+app.use((req, res, next) => {
+  console.log("Incoming request from origin:", req.headers.origin);
+  next();
+});
+
 // --------------------------------------------
-// ✅ EXPRESS-SESSION (Fix for Vercel + Render)
+// ✅ EXPRESS-SESSION (works with Render + HTTPS)
 // --------------------------------------------
 const sessionOptions = {
   secret: process.env.SESSION_SECRET || "kambaz",
   resave: false,
   saveUninitialized: false,
   cookie: {
-    sameSite: "none", // REQUIRED for cross-site
-    secure: true, // REQUIRED on Render (HTTPS)
+    sameSite: "none", // required for cross-site cookies
+    secure: true, // required on Render (HTTPS)
   },
 };
 
-// Render runs behind a proxy → must enable trust proxy
+// Trust proxy (needed for secure cookies behind Render proxy)
 app.set("trust proxy", 1);
 
 app.use(session(sessionOptions));
 
 // --------------------------------------------
-// ROUTES
+// ✅ ROUTES
 // --------------------------------------------
 UserRoutes(app, db);
 CourseRoutes(app, db);
@@ -47,7 +63,7 @@ Hello(app);
 Lab5(app);
 
 // --------------------------------------------
-// START SERVER
+// ✅ START SERVER
 // --------------------------------------------
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () =>
