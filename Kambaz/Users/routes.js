@@ -104,5 +104,19 @@ export default function UserRoutes(app, db) {
   app.get("/api/users", findAllUsers);
   app.get("/api/users/:userId", findUserById);
   app.delete("/api/users/:userId", deleteUser);
-  app.get("/api/users/signup", (req, res) => res.send("Signup route works!"));
+
+  // ---------- TEMP DEBUG ROUTES ----------
+  app.get("/debug/users", (req, res) => res.send("Users route loaded!"));
+  app.get("/debug/signup", (req, res) =>
+    res.send("Signup route active (POST expected)")
+  );
+  app.get("/debug/signin", (req, res) =>
+    res.send("Signin route active (POST expected)")
+  );
+  app.get("/debug/profile", (req, res) =>
+    res.send("Profile route active (POST expected)")
+  );
+  app.get("/debug/signout", (req, res) =>
+    res.send("Signout route active (POST expected)")
+  );
 }
