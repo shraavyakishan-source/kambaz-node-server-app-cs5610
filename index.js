@@ -10,41 +10,51 @@ import CourseRoutes from "./Kambaz/Courses/routes.js";
 
 const app = express();
 
-// ✅ Enable CORS and JSON parsing middleware
+// --------------------------------------------
+// ✅ CORS (must be FIRST and credentials:true)
+// --------------------------------------------
 app.use(
   cors({
-    credentials: true, // supports cookies
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: [
+      "http://localhost:3000",
+      process.env.CLIENT_URL, // your Vercel URL
+    ].filter(Boolean),
+    credentials: true,
   })
 );
-app.use(express.json()); // only once
 
-// ✅ Configure session BEFORE routes
+app.use(express.json());
+
+// --------------------------------------------
+// ✅ EXPRESS-SESSION (Fix for Vercel + Render)
+// --------------------------------------------
 const sessionOptions = {
   secret: process.env.SESSION_SECRET || "kambaz",
   resave: false,
   saveUninitialized: false,
+  cookie: {
+    sameSite: "none", // REQUIRED for cross-site
+    secure: true, // REQUIRED on Render (HTTPS)
+  },
 };
 
-if (process.env.SERVER_ENV !== "development") {
-  sessionOptions.proxy = true;
-  sessionOptions.cookie = {
-    sameSite: "none",
-    secure: true,
-    domain: process.env.SERVER_URL,
-  };
-}
+// Render runs behind a proxy → must enable trust proxy
+app.set("trust proxy", 1);
 
 app.use(session(sessionOptions));
 
-// ✅ Mount your routes AFTER configuring session
+// --------------------------------------------
+// ROUTES
+// --------------------------------------------
 UserRoutes(app, db);
 CourseRoutes(app, db);
 Hello(app);
 Lab5(app);
 
-// ✅ Start server
+// --------------------------------------------
+// START SERVER
+// --------------------------------------------
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () =>
-  console.log(`✅ Server running on http://localhost:${PORT}`)
+  console.log(`✅ Server running at http://localhost:${PORT}`)
 );
