@@ -5,6 +5,7 @@ import cors from "cors";
 import session from "express-session";
 import UserRoutes from "./Kambaz/Users/routes.js";
 import CourseRoutes from "./Kambaz/Courses/routes.js";
+import ModulesRoutes from "./Kambaz/Modules/routes.js";
 import Hello from "./Hello.js";
 import Lab5 from "./Lab5/index.js";
 import db from "./Kambaz/Database/index.js";
@@ -70,6 +71,7 @@ app.use((req, res, next) => {
 // ----------------------
 UserRoutes(app, db);
 CourseRoutes(app, db);
+ModulesRoutes(app, db);
 Hello(app);
 Lab5(app);
 

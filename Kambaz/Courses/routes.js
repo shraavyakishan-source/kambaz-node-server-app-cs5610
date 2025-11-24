@@ -1,76 +1,75 @@
 import CoursesDao from "./dao.js";
 import EnrollmentsDao from "../Enrollments/dao.js";
 
-export default function CourseRoutes(app, db) {
-  const dao = CoursesDao(db);
-  const enrollmentsDao = EnrollmentsDao(db);
+export default function CourseRoutes(app) {
+  const dao = CoursesDao();
+  const enrollmentsDao = EnrollmentsDao();
 
-  // GET /api/courses -> all courses
-  const findAllCourses = (req, res) => {
-    const courses = dao.findAllCourses();
+  // GET ALL COURSES
+  app.get("/api/courses", async (req, res) => {
+    const courses = await dao.findAllCourses();
     res.json(courses);
-  };
-  app.get("/api/courses", findAllCourses);
+  });
 
-  // GET /api/users/:userId/courses -> courses for the specified user (supports "current")
-  const findCoursesForEnrolledUser = (req, res) => {
+  // GET COURSES FOR ENROLLED USER
+  app.get("/api/courses/enrolled/:userId", async (req, res) => {
     let { userId } = req.params;
     if (userId === "current") {
-      const currentUser = req.session && req.session.currentUser;
-      if (!currentUser) {
-        res.sendStatus(401);
-        return;
-      }
+      const currentUser = req.session.currentUser;
+      if (!currentUser) return res.sendStatus(401);
       userId = currentUser._id;
     }
-    const courses = dao.findCoursesForEnrolledUser(userId);
+    const courses = await enrollmentsDao.findCoursesForUser(userId);
     res.json(courses);
-  };
-  app.get("/api/users/:userId/courses", findCoursesForEnrolledUser);
+  });
 
-  // POST /api/users/current/courses -> create a new course and enroll current user in it
-  const createCourse = (req, res) => {
-    const currentUser = req.session && req.session.currentUser;
-    if (!currentUser) {
-      res.sendStatus(401);
-      return;
+  // CREATE COURSE + AUTO-ENROLL CREATOR
+  app.post("/api/courses", async (req, res) => {
+    const newCourse = await dao.createCourse(req.body);
+    const currentUser = req.session.currentUser;
+    if (currentUser) {
+      await enrollmentsDao.enrollUserInCourse(currentUser._id, newCourse._id);
     }
+    res.json(newCourse);
+  });
 
-    const courseData = req.body || {};
-    // optional: ensure required fields exist (name, description) — validate as you like
-    const newCourse = dao.createCourse(courseData);
-
-    // enroll the creating user in the new course
-    if (typeof enrollmentsDao.enrollUserInCourse === "function") {
-      enrollmentsDao.enrollUserInCourse(currentUser._id, newCourse._id);
-    }
-
-    res.status(201).json(newCourse);
-  };
-  app.post("/api/users/current/courses", createCourse);
-
-  // DELETE /api/courses/:courseId -> delete course
-  const deleteCourse = (req, res) => {
+  // UPDATE COURSE
+  app.put("/api/courses/:courseId", async (req, res) => {
     const { courseId } = req.params;
-    const status = dao.deleteCourse(courseId);
-    if (status.status === "not_found") {
-      res.sendStatus(404);
-      return;
-    }
-    res.json(status);
-  };
-  app.delete("/api/courses/:courseId", deleteCourse);
+    const updatedCourse = await dao.updateCourse(courseId, req.body);
+    res.json(updatedCourse);
+  });
 
-  // PUT /api/courses/:courseId -> update course
-  const updateCourse = (req, res) => {
+  // DELETE COURSE
+  // Courses/routes.js
+  app.delete("/api/courses/:courseId", async (req, res) => {
     const { courseId } = req.params;
-    const courseUpdates = req.body || {};
-    const updated = dao.updateCourse(courseId, courseUpdates);
-    if (!updated) {
-      res.sendStatus(404);
-      return;
+
+    if (!courseId) {
+      return res.status(400).json({ error: "Course ID is required" });
     }
-    res.json(updated);
-  };
-  app.put("/api/courses/:courseId", updateCourse);
+
+    try {
+      console.log("Attempting to delete course:", courseId);
+
+      // Unenroll all users
+      const enrollmentsResult = await enrollmentsDao.unenrollAllUsersFromCourse(
+        courseId
+      );
+      console.log("Enrollments removed:", enrollmentsResult.deletedCount);
+
+      // Delete course
+      const deleteResult = await dao.deleteCourse(courseId);
+      console.log("Course deletion result:", deleteResult);
+
+      if (deleteResult.deletedCount === 0) {
+        return res.status(404).json({ error: "Course not found" });
+      }
+
+      res.json({ success: true, courseId });
+    } catch (err) {
+      console.error("Error deleting course:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
 }
