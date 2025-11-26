@@ -28,7 +28,6 @@ mongoose
 // Express App
 // ----------------------
 const app = express();
-app.use(express.json());
 
 // Debug: log environment variables
 console.log("CLIENT_URL from env:", process.env.CLIENT_URL);
@@ -77,6 +76,7 @@ const sessionOptions = {
 };
 
 app.use(session(sessionOptions));
+app.use(express.json());
 
 // Optional: debug incoming origins
 app.use((req, res, next) => {
