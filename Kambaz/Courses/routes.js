@@ -12,7 +12,7 @@ export default function CourseRoutes(app) {
   });
 
   // GET COURSES FOR ENROLLED USER
-  app.get("/api/courses/enrolled/:userId", async (req, res) => {
+  app.get("/api/users/:userId/courses", async (req, res) => {
     let { userId } = req.params;
     if (userId === "current") {
       const currentUser = req.session.currentUser;
@@ -23,52 +23,61 @@ export default function CourseRoutes(app) {
     res.json(courses);
   });
 
-  // CREATE COURSE + AUTO-ENROLL CREATOR
+  // ENROLL USER IN COURSE
+  app.post("/api/users/:uid/courses/:cid", async (req, res) => {
+    let { uid, cid } = req.params;
+    if (uid === "current") {
+      const currentUser = req.session.currentUser;
+      uid = currentUser._id;
+    }
+    const status = await enrollmentsDao.enrollUserInCourse(uid, cid);
+    res.send(status);
+  });
+
+  // UNENROLL USER FROM COURSE
+  app.delete("/api/users/:uid/courses/:cid", async (req, res) => {
+    let { uid, cid } = req.params;
+    if (uid === "current") {
+      const currentUser = req.session.currentUser;
+      uid = currentUser._id;
+    }
+    const status = await enrollmentsDao.unenrollUserFromCourse(uid, cid);
+    res.send(status);
+  });
+
+  // CREATE COURSE + AUTO ENROLL CREATOR
   app.post("/api/courses", async (req, res) => {
     const newCourse = await dao.createCourse(req.body);
+
     const currentUser = req.session.currentUser;
     if (currentUser) {
       await enrollmentsDao.enrollUserInCourse(currentUser._id, newCourse._id);
     }
+
     res.json(newCourse);
   });
 
   // UPDATE COURSE
   app.put("/api/courses/:courseId", async (req, res) => {
-    const { courseId } = req.params;
-    const updatedCourse = await dao.updateCourse(courseId, req.body);
+    const updatedCourse = await dao.updateCourse(req.params.courseId, req.body);
     res.json(updatedCourse);
   });
 
-  // DELETE COURSE
-  // Courses/routes.js
+  // DELETE COURSE + REMOVE ALL ENROLLMENTS
   app.delete("/api/courses/:courseId", async (req, res) => {
-    const { courseId } = req.params;
-
-    if (!courseId) {
-      return res.status(400).json({ error: "Course ID is required" });
-    }
-
     try {
-      console.log("Attempting to delete course:", courseId);
+      const { courseId } = req.params;
 
-      // Unenroll all users
-      const enrollmentsResult = await enrollmentsDao.unenrollAllUsersFromCourse(
-        courseId
-      );
-      console.log("Enrollments removed:", enrollmentsResult.deletedCount);
+      await enrollmentsDao.unenrollAllUsersFromCourse(courseId);
 
-      // Delete course
       const deleteResult = await dao.deleteCourse(courseId);
-      console.log("Course deletion result:", deleteResult);
 
       if (deleteResult.deletedCount === 0) {
         return res.status(404).json({ error: "Course not found" });
       }
 
-      res.json({ success: true, courseId });
+      res.json({ success: true });
     } catch (err) {
-      console.error("Error deleting course:", err);
       res.status(500).json({ error: err.message });
     }
   });

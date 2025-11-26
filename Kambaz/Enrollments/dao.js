@@ -26,8 +26,8 @@ export default function EnrollmentsDao(db) {
   }
 
   // Unenroll a user from a course
-  function unenrollUserFromCourse(courseId) {
-    return model.deleteOne({ course: courseId });
+  function unenrollUserFromCourse(userId, courseId) {
+    return model.deleteOne({ user: userId, course: courseId });
   }
   function unenrollAllUsersFromCourse(courseId) {
     return model.deleteMany({ course: courseId });
