@@ -50,9 +50,6 @@ app.use(
   })
 );
 
-// allow preflight
-app.options("*", cors());
-
 const sessionOptions = {
   secret: process.env.SESSION_SECRET || "kambaz",
   resave: false,
