@@ -42,10 +42,25 @@ app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://kambaz-next-js-a6-git-a6-shraavya-b-ks-projects.vercel.app",
-    ],
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like apps, curl, server-to-server)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      const allowed = [
+        "http://localhost:3000",
+        "https://kambaz-next-js.vercel.app",
+        "https://kambaz-next-js-a6-git-a6-shraavya-b-ks-projects.vercel.app",
+      ];
+
+      if (allowed.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.log("❌ Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
