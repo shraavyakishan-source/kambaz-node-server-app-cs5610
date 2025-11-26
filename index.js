@@ -51,7 +51,7 @@ app.use(
       const allowed = [
         "http://localhost:3000",
         "https://kambaz-next-js.vercel.app",
-        "https://kambaz-next-js-a6-git-a6-shraavya-b-ks-projects.vercel.app",
+        "https://kambaz-next-js-a6-blush.vercel.app",
       ];
 
       if (allowed.includes(origin)) {
