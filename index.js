@@ -37,32 +37,13 @@ console.log("CLIENT_URL from env:", process.env.CLIENT_URL);
 // ----------------------
 const isProduction = process.env.NODE_ENV === "production";
 
-app.set("trust proxy", 1);
-
 app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like apps, curl, server-to-server)
-      if (!origin) {
-        return callback(null, true);
-      }
-
-      const allowed = [
-        "http://localhost:3000",
-        "https://kambaz-next-js.vercel.app",
-        "https://kambaz-next-js-a6-blush.vercel.app",
-      ];
-
-      if (allowed.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.log("❌ Blocked by CORS:", origin);
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
+ cors({
+   credentials: true,
+   origin: process.env.CLIENT_URL || "http://localhost:3000",
+ })
 );
+app.set("trust proxy", 1);
 
 const sessionOptions = {
   secret: process.env.SESSION_SECRET || "kambaz",
