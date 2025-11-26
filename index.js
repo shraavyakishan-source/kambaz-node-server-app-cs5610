@@ -38,24 +38,29 @@ console.log("CLIENT_URL from env:", process.env.CLIENT_URL);
 // ----------------------
 const isProduction = process.env.NODE_ENV === "production";
 
-// Must come before routes
-app.set("trust proxy", 1); // Needed if behind proxy like Render
+app.set("trust proxy", 1);
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", process.env.CLIENT_URL], // frontend URLs
-    credentials: true, // allow cookies
+    origin: [
+      "http://localhost:3000",
+      "https://kambaz-next-js-a6-git-a6-shraavya-b-ks-projects.vercel.app",
+    ],
+    credentials: true,
   })
 );
+
+// allow preflight
+app.options("*", cors());
 
 const sessionOptions = {
   secret: process.env.SESSION_SECRET || "kambaz",
   resave: false,
   saveUninitialized: false,
   cookie: {
-    sameSite: isProduction ? "none" : "lax", // none for prod cross-site, lax for local dev
-    secure: isProduction, // only true in production (HTTPS)
-    maxAge: 1000 * 60 * 60 * 24, // 1 day
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction,
+    maxAge: 1000 * 60 * 60 * 24,
   },
 };
 
