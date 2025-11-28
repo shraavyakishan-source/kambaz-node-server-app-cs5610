@@ -18,10 +18,16 @@ export default function CoursesDao() {
   const updateCourse = (courseId, courseUpdates) =>
     model.findByIdAndUpdate(courseId, courseUpdates, { new: true });
 
+  const findUsersForCourse = async (courseId) => {
+    const enrollments = await model.find({ course: courseId }).populate("user"); // returns user objects, not just IDs
+    return enrollments.map((e) => e.user);
+  };
+
   return {
     findAllCourses,
     createCourse,
     deleteCourse,
     updateCourse,
+    findUsersForCourse,
   };
 }

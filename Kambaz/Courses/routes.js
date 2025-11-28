@@ -81,4 +81,16 @@ export default function CourseRoutes(app) {
       res.status(500).json({ error: err.message });
     }
   });
+
+  // GET USERS ENROLLED IN A COURSE
+  app.get("/api/courses/:cid/users", async (req, res) => {
+    try {
+      const { cid } = req.params;
+      const users = await enrollmentsDao.findUsersForCourse(cid);
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users for course:", error);
+      res.status(500).send("Error fetching users for course");
+    }
+  });
 }
