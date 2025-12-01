@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import moduleSchema from "../Modules/schema.js";
+import QuizSchema from "../Quizzes/schema.js";
+
 const courseSchema = new mongoose.Schema(
   {
     _id: String,
@@ -8,6 +10,10 @@ const courseSchema = new mongoose.Schema(
     credits: Number,
     description: String,
     modules: [moduleSchema],
+    quizzes: {
+      type: [QuizSchema],
+      default: [],
+    },
   },
   { collection: "courses" }
 );

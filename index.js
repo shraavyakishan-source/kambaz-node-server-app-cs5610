@@ -7,6 +7,7 @@ import UserRoutes from "./Kambaz/Users/routes.js";
 import CourseRoutes from "./Kambaz/Courses/routes.js";
 import ModulesRoutes from "./Kambaz/Modules/routes.js";
 import EnrollmentsRoutes from "./Kambaz/Enrollments/routes.js";
+import QuizzesRoutes from "./Kambaz/Quizzes/routes.js";
 import Hello from "./Hello.js";
 import Lab5 from "./Lab5/index.js";
 import db from "./Kambaz/Database/index.js";
@@ -38,10 +39,10 @@ console.log("CLIENT_URL from env:", process.env.CLIENT_URL);
 const isProduction = process.env.NODE_ENV === "production";
 
 app.use(
- cors({
-   credentials: true,
-   origin: process.env.CLIENT_URL || "http://localhost:3000",
- })
+  cors({
+    credentials: true,
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
+  })
 );
 app.set("trust proxy", 1);
 
@@ -72,6 +73,7 @@ UserRoutes(app, db);
 CourseRoutes(app, db);
 ModulesRoutes(app, db);
 EnrollmentsRoutes(app, db);
+QuizzesRoutes(app);
 Hello(app);
 Lab5(app);
 
