@@ -11,10 +11,9 @@ import QuizzesRoutes from "./Kambaz/Quizzes/routes.js";
 import Hello from "./Hello.js";
 import Lab5 from "./Lab5/index.js";
 import db from "./Kambaz/Database/index.js";
+import QuestionRoutes from "./Kambaz/Quizzes/questions.routes.js";
 
-// ----------------------
 // MongoDB Connection
-// ----------------------
 const CONNECTION_STRING =
   process.env.DATABASE_CONNECTION_STRING || "mongodb://127.0.0.1:27017/Kambaz";
 
@@ -25,17 +24,14 @@ mongoose
     console.log("Connected database name:", mongoose.connection.name); // <-- move inside .then()
   })
   .catch((err) => console.error("❌ MongoDB connection error:", err));
-// ----------------------
+
 // Express App
-// ----------------------
 const app = express();
 
 // Debug: log environment variables
 console.log("CLIENT_URL from env:", process.env.CLIENT_URL);
 
-// ----------------------
 // CORS + Session
-// ----------------------
 const isProduction = process.env.NODE_ENV === "production";
 
 app.use(
@@ -66,20 +62,17 @@ app.use((req, res, next) => {
   next();
 });
 
-// ----------------------
 // Routes
-// ----------------------
 UserRoutes(app, db);
 CourseRoutes(app, db);
 ModulesRoutes(app, db);
 EnrollmentsRoutes(app, db);
 QuizzesRoutes(app);
+QuestionRoutes(app);
 Hello(app);
 Lab5(app);
 
-// ----------------------
 // Start Server
-// ----------------------
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () =>
   console.log(`✅ Server running at http://localhost:${PORT}`)
