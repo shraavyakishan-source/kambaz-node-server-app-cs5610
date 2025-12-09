@@ -1,10 +1,16 @@
 import mongoose from "mongoose";
-import { quizSchema, questionSchema } from "./schema.js";
+import { quizSchema, questionSchema, quizAttemptSchema } from "./schema.js";
 
-// Quiz model
-const QuizModel = mongoose.model("Quiz", quizSchema, "quizzes");
+export const QuizModel = mongoose.model("Quiz", quizSchema, "quizzes");
+export const QuestionModel = mongoose.model(
+  "Question",
+  questionSchema,
+  "questions"
+);
 
-// Question model
-const QuestionModel = mongoose.model("Question", questionSchema, "questions");
-
-export { QuizModel, QuestionModel };
+// ✅ NEW model
+export const QuizAttempt = mongoose.model(
+  "QuizAttempt",
+  quizAttemptSchema,
+  "quiz_attempts"
+);

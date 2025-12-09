@@ -45,4 +45,23 @@ export const questionSchema = new mongoose.Schema(
   { collection: "questions" }
 );
 
+// QuizAttempt schema
+export const quizAttemptSchema = new mongoose.Schema(
+  {
+    student: { type: String, required: true },
+    course: { type: String, required: true },
+    quiz: { type: String, required: true },
+
+    answers: { type: Array, default: [] },
+    startedAt: { type: Date, default: Date.now },
+
+    status: {
+      type: String,
+      enum: ["IN_PROGRESS", "COMPLETED"],
+      default: "IN_PROGRESS",
+    },
+  },
+  { collection: "quiz_attempts" }
+);
+
 export default quizSchema;
