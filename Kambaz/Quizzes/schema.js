@@ -13,6 +13,7 @@ export const quizSchema = new mongoose.Schema(
     shuffleAnswers: { type: Boolean, default: true },
     timeLimit: { type: Number, default: 0 },
     multipleAttempts: { type: Boolean, default: false },
+    howManyAttempts: { type: Number, default: 1 },
     showCorrectAnswers: { type: String, default: "Never" },
     accessCode: { type: String, default: "" },
     oneQuestionAtATime: { type: Boolean, default: true },
@@ -52,7 +53,9 @@ export const quizAttemptSchema = new mongoose.Schema(
     course: { type: String, required: true },
     quiz: { type: String, required: true },
 
+    attemptNumber: { type: Number, required: true },
     answers: { type: Array, default: [] },
+    score: { type: Number, default: 0 },
     startedAt: { type: Date, default: Date.now },
 
     status: {
